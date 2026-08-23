@@ -10,7 +10,6 @@ export async function uploadDocument({ file, kbId }, onUploadProgress) {
   formData.append('file', file)
   formData.append('kbId', kbId)
   const { data } = await api.post('/documents/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress,
   })
   return data.document
