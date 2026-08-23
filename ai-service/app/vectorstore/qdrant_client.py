@@ -96,11 +96,14 @@ def search(collection_name: str, query_vector: list[float], top_k: int = 5):
 
 
 def delete_document_vectors(collection_name: str, document_id: str) -> None:
-    """Removes every chunk belonging to one document — used when a
-    document is deleted without deleting the whole knowledge base."""
     client = get_client()
     if collection_name not in {c.name for c in client.get_collections().collections}:
         return
+    client.create_payload_index(
+        collection_name=collection_name,
+        field_name="document_id",
+        field_schema="keyword",
+    )
     client.delete(
         collection_name=collection_name,
         points_selector=Filter(must=[FieldCondition(key="document_id", match=MatchValue(value=document_id))]),
@@ -108,14 +111,21 @@ def delete_document_vectors(collection_name: str, document_id: str) -> None:
 
 
 def get_document_chunks(collection_name: str, document_id: str) -> list[dict]:
-    """Fetches every chunk belonging to one document, ordered by
-    chunk_index — used by summarization and comparison, which need a
-    document's full (chunked) text rather than a similarity search.
-    Returns an empty list if the collection or document isn't found.
-    """
     client = get_client()
     if collection_name not in {c.name for c in client.get_collections().collections}:
         return []
+
+    # Qdrant Cloud requires an explicit payload index before a field can
+    # be used in a filter (embedded/local Qdrant is more lenient, which is
+    # why this wasn't caught until deploying against a real cluster).
+    # Creating an index that already exists is a safe no-op — this makes
+    # existing collections (indexed before this fix) work immediately,
+    # with no need to re-upload documents.
+    client.create_payload_index(
+        collection_name=collection_name,
+        field_name="document_id",
+        field_schema="keyword",
+    )
 
     points, _ = client.scroll(
         collection_name=collection_name,
@@ -125,7 +135,6 @@ def get_document_chunks(collection_name: str, document_id: str) -> list[dict]:
     )
     ordered = sorted(points, key=lambda p: p.payload.get("chunk_index", 0))
     return [{"text": p.payload["text"], "chunk_index": p.payload.get("chunk_index", 0)} for p in ordered]
-
 
 def delete_collection(collection_name: str) -> None:
     """Used when an entire knowledge base is deleted."""
