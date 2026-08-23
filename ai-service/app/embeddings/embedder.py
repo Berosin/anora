@@ -19,6 +19,21 @@ from functools import lru_cache
 
 EMBEDDING_DIM = 384  # matches all-MiniLM-L6-v2's output size
 
+def _huggingface_api_embed(texts: list[str]) -> list[list[float]]:
+    import httpx
+
+    token = os.environ["HUGGINGFACE_API_TOKEN"]
+    model = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+
+    response = httpx.post(
+        f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model}",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"inputs": texts, "options": {"wait_for_model": True}},
+        timeout=60,
+    )
+    response.raise_for_status()
+    return response.json()
+
 
 def _deterministic_hash_embedding(text: str) -> list[float]:
     digest = hashlib.sha256(text.encode("utf-8")).digest()
@@ -45,6 +60,9 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
 
     if provider == "deterministic-hash":
         return [_deterministic_hash_embedding(t) for t in texts]
+
+    if provider == "huggingface-api":
+        return _huggingface_api_embed(texts)
 
     if provider == "sentence-transformers":
         model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
