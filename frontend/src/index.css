@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------
+   ANORA design tokens
+   Deep ink background, editorial serif display for headlines,
+   Inter for body/UI, IBM Plex Mono for document metadata
+   (page numbers, chunk ids, scores) — the mono face is used
+   functionally, wherever the product surfaces a literal fact
+   pulled from a document.
+--------------------------------------------------------- */
+@theme {
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-ink: #0b0f19;
+  --color-surface: #131826;
+  --color-surface-raised: #1a2133;
+  --color-hairline: #232b3d;
+  --color-text: #eceef3;
+  --color-muted: #8a93a6;
+  --color-faint: #5b6376;
+
+  --color-signal: #e8a33d;
+  --color-signal-dim: #a9762c;
+  --color-vector: #5ec8d8;
+  --color-ready: #6fcf97;
+  --color-failed: #e8695d;
+
+  --color-paper: #f7f5ef;
+  --color-paper-muted: #6b6558;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .hairline {
+    border-color: var(--color-hairline);
+  }
+
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0.75rem;
+  }
+
+  .label-mono {
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--color-muted);
+  }
+
+  .btn-primary {
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+    font-weight: 600;
+    border-radius: 0.6rem;
+    padding: 0.65rem 1.25rem;
+    transition: transform 120ms ease, background-color 120ms ease;
+  }
+  .btn-primary:hover {
+    background-color: #f0af52;
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0.6rem;
+    padding: 0.65rem 1.25rem;
+    transition: border-color 120ms ease, background-color 120ms ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--color-faint);
+    background-color: var(--color-surface-raised);
+  }
+
+  .input-field {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    color: var(--color-text);
+    width: 100%;
+    transition: border-color 120ms ease;
+  }
+  .input-field:focus {
+    border-color: var(--color-signal);
+    outline: none;
+  }
+  .input-field::placeholder {
+    color: var(--color-faint);
+  }
+}
+
+@layer utilities {
+  @keyframes scan-sweep {
+    0% { transform: translateY(-2px); opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { transform: translateY(168px); opacity: 0; }
+  }
+
+  @keyframes line-glow {
+    0%, 100% { color: var(--color-faint); }
+    50% { color: var(--color-signal); }
+  }
+
+  @keyframes card-rise {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-scan-sweep {
+    animation: scan-sweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .animate-card-rise {
+    animation: card-rise 700ms ease-out both;
+  }
+}
