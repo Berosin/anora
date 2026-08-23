@@ -26,7 +26,7 @@ def _huggingface_api_embed(texts: list[str]) -> list[list[float]]:
     model = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
     response = httpx.post(
-        f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model}",
+        f"https://router.huggingface.co/hf-inference/models/{model}/pipeline/feature-extraction",
         headers={"Authorization": f"Bearer {token}"},
         json={"inputs": texts, "options": {"wait_for_model": True}},
         timeout=60,
