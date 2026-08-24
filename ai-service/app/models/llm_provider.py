@@ -43,9 +43,9 @@ class GroqProvider(BaseLLMProvider):
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.2,
-                "max_tokens": 600,
+                "max_tokens": 1500,
             },
-            timeout=30,
+            timeout=45,
         )
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"].strip()
