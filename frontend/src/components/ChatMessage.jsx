@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Copy, Check, User, Sparkles } from 'lucide-react'
 import SourceCitation from './SourceCitation'
+import FormattedAiText from './FormattedAiText'
 
 export default function ChatMessage({ message }) {
   const [copied, setCopied] = useState(false)
@@ -30,7 +31,7 @@ export default function ChatMessage({ message }) {
           className={`px-4 py-2.5 text-sm leading-relaxed rounded-xl ${isUser ? 'text-text' : 'card'}`}
           style={isUser ? { backgroundColor: 'var(--color-surface-raised)' } : undefined}
         >
-          {message.content}
+          {isUser ? message.content : <FormattedAiText text={message.content} />}
         </div>
 
         {!isUser && (
